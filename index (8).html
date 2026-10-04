@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mon espace d'étude</title>
+<style>
+:root{--bg:#eef2f0;--ink:#14232b;--mut:#5b6b70;--card:#fff;--ac:#2f5bff;--onac:#fff;--warn:#ff7a3d;--line:#d3dcd8}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1a1f;--ink:#e8f0ee;--mut:#8fa3a8;--card:#18262c;--ac:#7b96ff;--onac:#0f1a1f;--line:#2a3b42}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS",Verdana,sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 80px}
+h1{font:700 2rem/1.1 Georgia,serif;margin:8px 0 4px}
+h2{font:700 1.2rem Georgia,serif;margin:24px 0 8px}
+p{margin:4px 0 12px;color:var(--mut)}
+nav{display:flex;gap:6px;overflow-x:auto;margin:16px 0;border-bottom:2px solid var(--line)}
+nav button{flex:none;white-space:nowrap;background:none;border:0;padding:10px;font:inherit;color:var(--mut);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav button.on{color:var(--ink);border-color:var(--ac);font-weight:700}
+.tab{display:none}.tab.on{display:block}
+.m{display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:14px;margin:8px 0;font:inherit;color:var(--ink);cursor:pointer}
+.m.on{border-color:var(--ac)}
+.m b{display:block;font-size:1.1rem}.m span{color:var(--mut);font-size:.92rem}
+input,button.b{font:inherit;padding:10px 12px;border-radius:8px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+input{width:100%;margin:4px 0}
+button.b{background:var(--ac);color:var(--onac);border-color:var(--ac);cursor:pointer;font-weight:700}
+button.b.g{background:none;color:var(--ink);border-color:var(--line)}
+.row{display:flex;gap:8px;align-items:center}
+.ev{display:flex;justify-content:space-between;gap:8px;background:var(--card);border-left:5px solid var(--ac);border-radius:6px;padding:10px 12px;margin:6px 0}
+.ev.done{opacity:.5;border-color:var(--line)}
+.ev small{color:var(--mut);display:block}
+.ev button{background:none;border:0;color:var(--warn);font-size:1.2rem;cursor:pointer}
+.note{font-size:.88rem;border-left:4px solid var(--warn);padding:6px 10px;background:var(--card);border-radius:4px}
+#ov,#ring{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;z-index:9}
+#ov{background:#0d1b22;color:#e8f0ee}
+#ov.pause{background:#17402f}
+#ring{background:rgba(0,0,0,.8);color:#fff}
+#clock{font:700 5rem/1 Georgia,serif;margin:12px 0}
+#ov ul{list-style:none;padding:0;margin:8px 0 20px}
+#ov li{display:inline-block;border:2px solid var(--warn);color:var(--warn);border-radius:20px;padding:2px 12px;margin:3px}
+:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+</style></head>
+<body><main>
+<div class="row" style="justify-content:flex-end;gap:10px"><small id="sync"></small><small>Compte : <b id="who"></b></small><button class="b g" id="out">Déconnexion</button></div>
+<h1>Mon espace d'étude</h1>
+<p>Choisis ta méthode, lance une session, planifie tes révisions.</p>
+<nav id="nv"></nav>
+<div id="pages"></div>
+
+<section id="apps" class="tab">
+<h2>Apps à ne pas ouvrir</h2>
+<p>Pendant la session, cette liste reste affichée en plein écran.</p>
+<div class="row"><input id="ai" placeholder="Ex : Instagram"><button class="b" id="aa">Ajouter</button></div>
+<div id="al"></div>
+<p class="note">Un site ne peut pas bloquer d'autres applications. Pour les verrouiller vraiment, utilise « Temps d'écran » (iPhone), « Bien-être numérique » (Android) ou le mode Concentration de ton ordinateur. Ici, le site te rappelle ton engagement et compte chaque fois que tu quittes la page.</p>
+</section>
+
+<section id="ag" class="tab">
+<h2>Nouvelle alarme</h2>
+<input id="et" placeholder="Ex : Réviser les maths">
+<input id="ed" type="datetime-local">
+<button class="b" id="ea" style="width:100%;margin-top:6px">Ajouter à l'agenda</button>
+<p class="note">L'alarme sonne seulement si cette page reste ouverte (onglet en arrière-plan accepté).</p>
+<h2>Mon agenda</h2><div id="el"></div>
+</section>
+</main>
+
+<div id="auth" style="position:fixed;inset:0;background:var(--bg);z-index:20;display:flex;flex-direction:column;justify-content:center;padding:24px;max-width:420px;margin:auto;overflow:auto">
+<h1>Mon espace d'étude</h1><p>Connecte-toi ou crée un compte pour retrouver tes données sur tous tes appareils.</p>
+<input id="au" type="email" placeholder="E-mail" autocomplete="username"><input id="ap" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
+<p id="ae" style="color:var(--warn);min-height:1.5em"></p>
+<button class="b" id="authIn">Se connecter</button><button class="b g" id="authUp" style="margin-top:8px">Créer un compte</button>
+<button class="b g" id="cc" style="margin-top:16px;font-size:.85rem">Connexion Supabase</button>
+<div id="cfgbox" style="display:none"><p>Colle l'URL du projet et la clé « anon public » (Supabase > Project Settings > API).</p>
+<input id="cu" placeholder="https://xxxx.supabase.co"><input id="ck" placeholder="Clé anon public"><button class="b" id="cs" style="margin-top:6px">Enregistrer</button></div></div>
+<div id="ov"><div id="ph"></div><div id="clock">25:00</div><div id="info"></div>
+<h2>À ne pas ouvrir</h2><ul id="bl"></ul>
+<button class="b g" id="stop" style="color:inherit;border-color:currentColor">Arrêter la session</button></div>
+
+<div id="ring"><h1 id="rt"></h1><button class="b" id="rs">Arrêter l'alarme</button></div>
+
+<script>
+const $=s=>document.querySelector(s);
+let P='';
+const S={get(k,d){try{const v=JSON.parse(localStorage.getItem(P+k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(P+k,JSON.stringify(v))}catch(e){}if(P)sched()}};
+const M=[{n:"Pomodoro",w:25,b:5,d:"25 min de travail, 5 min de pause. Idéal pour démarrer."},
+{n:"Long focus",w:50,b:10,d:"50 min de travail, 10 min de pause. Pour les cours denses."},
+{n:"Deep work",w:90,b:20,d:"90 min de travail, 20 min de pause. Pour les gros chapitres."}];
+let sel=0,apps=[],evs=[];
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const TABS=[...M.map((m,i)=>({id:'m'+i,l:m.n})),{id:'hist',l:'Historique'},{id:'apps',l:'Apps'},{id:'ag',l:'Agenda'}];
+let hist=[];
+function go(id){document.querySelectorAll('nav button,.tab').forEach(x=>x.classList.remove('on'));
+ document.querySelector('[data-t="'+id+'"]').classList.add('on');$('#'+id).classList.add('on')}
+function build(){$('#nv').innerHTML=TABS.map(t=>`<button data-t="${t.id}">${t.l}</button>`).join('');
+ $('#pages').innerHTML=M.map((m,i)=>`<section id="m${i}" class="tab"><h2>${m.n}</h2><p>${m.d}</p>
+ <p class="note">Avant de lancer : active ton mode Focus Android (Réglages rapides > Focus).</p>
+ <button class="b" data-go="${i}" style="width:100%;margin:12px 0">Lancer ${m.n}</button>
+ <h2>Mes sessions ${m.n}</h2><div class="hl" data-m="${i}"></div></section>`).join('')+
+ '<section id="hist" class="tab"><h2>Historique</h2><div class="hl" data-m="all"></div></section>';
+ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
+ document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>start(+b.dataset.go));
+ go('m0')}
+function rH(){document.querySelectorAll('.hl').forEach(d=>{const k=d.dataset.m;
+ const l=hist.filter(h=>k=='all'||h.m==M[k].n).slice().reverse();
+ d.innerHTML=l.map(h=>`<div class="ev"><div>${esc(h.m)} · ${h.min} min${h.full?'':' (arrêtée)'}<small>${new Date(h.t).toLocaleString('fr-FR',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})}</small></div></div>`).join('')||'<p>Aucune session pour le moment.</p>'})}
+function addH(min,full){hist.push({m:M[sel].n,t:Date.now(),min,full});S.set('hist',hist);rH()}
+function rA(){$('#al').innerHTML=apps.map((a,i)=>`<div class="ev"><span>${esc(a)}</span><button data-i="${i}" aria-label="Retirer">×</button></div>`).join('')||'<p>Aucune app dans la liste.</p>';
+ $('#al').querySelectorAll('button').forEach(b=>b.onclick=()=>{apps.splice(+b.dataset.i,1);S.set('apps',apps);rA()})}
+$('#aa').onclick=()=>{const v=$('#ai').value.trim();if(v){apps.push(v);S.set('apps',apps);$('#ai').value='';rA()}};
+
+/* Sons */
+let ac,ringI;
+function beep(){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=880;g.gain.setValueAtTime(.3,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.4);o.start();o.stop(ac.currentTime+.4)}catch(e){}}
+function ring(t){$('#rt').textContent="⏰ "+t;$('#ring').style.display='flex';beep();clearInterval(ringI);ringI=setInterval(beep,900);
+ try{if(Notification.permission=='granted')new Notification("Alarme",{body:t})}catch(e){}}
+$('#rs').onclick=()=>{clearInterval(ringI);$('#ring').style.display='none'};
+
+/* Session */
+let T=null;
+function start(i){sel=i;S.set('m',i);const m=M[i];T={ph:'w',ps:Date.now(),end:Date.now()+m.w*6e4,leaves:0,n:0};
+ $('#bl').innerHTML=apps.map(a=>`<li>${esc(a)}</li>`).join('')||'<li>Aucune</li>';
+ $('#ov').style.display='flex';$('#ov').classList.remove('pause');beep();tick();
+ try{document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}}
+let sc=0;
+$('#stop').onclick=()=>{const b=$('#stop');
+ if(!sc){b.textContent='Appuie encore pour confirmer';sc=setTimeout(()=>{sc=0;b.textContent="Arrêter la session"},3000);return}
+ clearTimeout(sc);sc=0;b.textContent="Arrêter la session";
+ if(T.ph=='w'){const e=Math.round((Date.now()-T.ps)/6e4);if(e>=1)addH(e,false)}
+ T=null;document.title="Mon espace d'étude";$('#ov').style.display='none';try{document.exitFullscreen().catch(()=>{})}catch(e){}};
+document.addEventListener('visibilitychange',()=>{if(T&&T.ph=='w'&&document.hidden)T.leaves++});
+window.addEventListener('beforeunload',e=>{if(T){e.preventDefault();e.returnValue=''}});
+function tick(){
+ if(T){const m=M[sel];let r=T.end-Date.now();
+  if(r<=0){beep();setTimeout(beep,500);if(T.ph=='w'){T.n++;addH(m.w,true);T.ph='b'}else T.ph='w';T.ps=Date.now();
+   T.end=Date.now()+(T.ph=='w'?m.w:m.b)*6e4;r=T.end-Date.now();
+   $('#ov').classList.toggle('pause',T.ph=='b')}
+  r=Math.max(0,Math.ceil(r/1000));
+  $('#clock').textContent=String(Math.floor(r/60)).padStart(2,'0')+':'+String(r%60).padStart(2,'0');
+  $('#ph').textContent=T.ph=='w'?'Concentration':'Pause : respire';
+  $('#info').textContent=T.n+' session(s) terminée(s) · '+T.leaves+' sortie(s) de la page';
+  document.title=$('#clock').textContent+' · Étude'}
+ const now=Date.now();
+ evs.forEach(e=>{if(!e.done&&e.t<=now){e.done=true;S.set('evs',evs);rE();ring(e.n)}})}
+setInterval(tick,500);
+
+/* Agenda */
+function rE(){const l=[...evs].sort((a,b)=>a.t-b.t);
+ $('#el').innerHTML=l.map(e=>`<div class="ev ${e.done?'done':''}"><div>${esc(e.n)}<small>${new Date(e.t).toLocaleString('fr-FR',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})}</small></div><button data-id="${e.id}" aria-label="Supprimer">×</button></div>`).join('')||'<p>Rien de prévu. Ajoute ta première alarme.</p>';
+ $('#el').querySelectorAll('button').forEach(b=>b.onclick=()=>{evs=evs.filter(e=>e.id!=b.dataset.id);S.set('evs',evs);rE()})}
+$('#ea').onclick=()=>{const n=$('#et').value.trim(),d=$('#ed').value;if(!n||!d){alert("Remplis le titre et la date.");return}
+ evs.push({id:Date.now(),n,t:new Date(d).getTime(),done:false});S.set('evs',evs);$('#et').value='';rE();
+ try{if(Notification.permission=='default')Notification.requestPermission()}catch(e){}beep()};
+
+const G={get(k,d){const o=P;P='';const v=S.get(k,d);P=o;return v},set(k,v){const o=P;P='';S.set(k,v);P=o}};
+const DEF={url:"https://cdzoilutkdhrlyyodeln.supabase.co",key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkem9pbHV0a2Rocmx5eW9kZWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNjc1NjksImV4cCI6MjEwNjY0MzU2OX0.osh4nNvnpDXZIvYyeU9zeGeL3QwjdeaewgTMiIToA6g"}; /* Colle ici l'URL et la clé anon Supabase avant de déployer */
+let CFG=(DEF.url&&DEF.key)?DEF:G.get('sb',null),SES=G.get('ses',null),pt,noPush=false;
+const api=(p,o={},t)=>fetch(CFG.url+p,{...o,headers:{apikey:CFG.key,'Content-Type':'application/json',...((t||CFG.key.startsWith('eyJ'))?{Authorization:'Bearer '+(t||CFG.key)}:{}),...(o.headers||{})}});
+const mk=j=>({at:j.access_token,rt:j.refresh_token,uid:j.user.id,exp:Date.now()+j.expires_in*1000});
+async function fresh(){if(!SES)return null;
+ if(Date.now()>SES.exp-60000){const r=await api('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:SES.rt})});const j=await r.json();
+  if(!r.ok){SES=null;G.set('ses',null);return null}SES=mk(j);G.set('ses',SES)}return SES}
+function sched(){if(noPush||!SES||!CFG)return;clearTimeout(pt);pt=setTimeout(push,800)}
+async function push(){try{const s=await fresh();if(!s)return;
+ const r=await api('/rest/v1/user_data?on_conflict=user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates'},body:JSON.stringify({user_id:s.uid,data:{m:sel,apps,evs,hist},updated_at:new Date().toISOString()})},s.at);
+ $('#sync').textContent=r.ok?'Synchronisé ✓ ':'Erreur de synchro '}catch(e){$('#sync').textContent='Hors ligne '}}
+async function pull(){try{const s=await fresh();if(!s)return;
+ const r=await api('/rest/v1/user_data?select=data&user_id=eq.'+s.uid,{},s.at),j=await r.json();
+ if(r.ok&&j[0])['m','apps','evs','hist'].forEach(k=>{if(j[0].data[k]!==undefined)S.set(k,j[0].data[k])})}catch(e){}}
+async function enter(u,label){P='u:'+u+':';noPush=true;await pull();noPush=false;
+ if(!SES){P='';return}
+ sel=S.get('m',0);apps=S.get('apps',["Instagram","TikTok","YouTube"]);evs=S.get('evs',[]);hist=S.get('hist',[]);
+ $('#auth').style.display='none';$('#who').textContent=label;build();rH();rA();rE();push()}
+async function auth(create){const em=$('#au').value.trim(),p=$('#ap').value,er=$('#ae');
+ if(!CFG){er.textContent="Configure d'abord la connexion Supabase.";return}
+ if(!em.includes('@')||p.length<6){er.textContent="E-mail valide et mot de passe de 6 caractères min.";return}
+ er.textContent='Connexion…';
+ try{const r=await api(create?'/auth/v1/signup':'/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:em,password:p})});const j=await r.json();
+  if(!r.ok)throw new Error(j.msg||j.error_description||j.message||'Erreur');
+  if(!j.access_token){er.textContent="Compte créé. Confirme ton e-mail, puis connecte-toi.";return}
+  SES=mk(j);G.set('ses',SES);G.set('em',em);er.textContent='';await enter(SES.uid,em)}
+ catch(e){er.textContent=e.message}}
+$('#authIn').onclick=()=>auth(false);$('#authUp').onclick=()=>auth(true);
+$('#cc').onclick=()=>{$('#cfgbox').style.display='block'};
+$('#cs').onclick=()=>{const u=$('#cu').value.trim().replace(/\/+$/,''),k=$('#ck').value.trim();
+ if(!u.startsWith('https://')||k.length<20){$('#ae').textContent="URL (https://…) ou clé invalide.";return}
+ CFG={url:u,key:k};G.set('sb',CFG);$('#cfgbox').style.display='none';$('#ae').textContent='Connexion enregistrée.'};
+$('#out').onclick=()=>{if(T)return;G.set('ses',null);location.reload()};
+if(DEF.url&&DEF.key)$('#cc').style.display='none';
+if(!CFG)$('#cfgbox').style.display='block';
+if(SES&&CFG)enter(SES.uid,G.get('em',''));
+</script></body></html>
